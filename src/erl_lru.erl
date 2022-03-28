@@ -1,5 +1,5 @@
 %%%
-%%% Copyright (c) 2018 Dmitry Poroh
+%%% Copyright (c) 2018-2022 Dmitry Poroh
 %%% All rights reserved.
 %%% Distributed under the terms of the MIT License. See the LICENSE file.
 %%%
@@ -21,7 +21,8 @@
          size/1,
          take/2,
          has_key/2,
-         lookup_and_update/2
+         lookup_and_update/2,
+         peek/2
         ]).
 -export_type([lru/0]).
 
@@ -137,6 +138,20 @@ lookup_and_update(Key, #lru{lookup_cache = Cache} = LRU) ->
         error ->
             error
     end.
+
+%% @doc Quick lookup without affecting LRU properties of cache.
+%%
+%% Complexity: O(1)
+-spec peek(key(), lru()) -> {ok, value()} | error.
+peek(Key, #lru{lookup_cache = Cache}) ->
+    try maps:get(Key, Cache) of
+        {_, Value} ->
+            {ok, Value}
+    catch
+        error:{badkey, _} ->
+            error
+    end.
+
 
 %%====================================================================
 %% Internal functions

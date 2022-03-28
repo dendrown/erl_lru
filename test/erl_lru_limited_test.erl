@@ -1,5 +1,5 @@
 %%
-%% Copyright (c) 2019 Dmitry Poroh
+%% Copyright (c) 2019-2022 Dmitry Poroh
 %% All rights reserved.
 %% Distributed under the terms of the MIT License. See the LICENSE file.
 %%
@@ -94,4 +94,16 @@ add_as_update_test() ->
     ?assertEqual(true, erl_lru:has_key(key2, L5)),
     ?assertEqual(true, erl_lru:has_key(key4, L5)),
     ?assertEqual(false, erl_lru:has_key(key3, L5)),
+    ok.
+
+peek_test() ->
+    L0 = erl_lru:new(2),
+    L1 = erl_lru:add(key1, value1, L0),
+    L2 = erl_lru:add(key2, value2, L1),
+    ?assertEqual({ok, value1}, erl_lru:peek(key1, L2)),
+    ?assertEqual({ok, value2}, erl_lru:peek(key2, L2)),
+    ?assertEqual(error, erl_lru:peek(key3, L2)),
+    L3 = erl_lru:add(key3, value3, L2),
+    ?assertEqual({ok, value3}, erl_lru:peek(key3, L3)),
+    ?assertEqual(error, erl_lru:peek(key1, L3)),
     ok.
